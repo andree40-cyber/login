@@ -17,7 +17,7 @@
       const launchBtn = $('launchBtn'), launchText = $('launchText');
       const resetBtn = $('resetBtn'), status = $('simStatus'), speed = $('playbackSpeed');
       const numberFormat = (n, digits = 2) => Number(n).toLocaleString('es-PE', {minimumFractionDigits: digits,maximumFractionDigits: digits});
-      let values, progress = 0, playing = false, raf = 0, lastFrameTime = 0;
+      let values, progress = 0, playing = false, raf = 0, lastFrameTime = 0, flightDurationMs = 1700, rocketVisible = false;
       let previewing = false;
       let cameraMaxX = 0, cameraMaxY = 0;
       const reference = (()=>{const v=50,t=Math.PI/4,g=9.81;return {g, vx:v*Math.cos(t), vy:v*Math.sin(t), T:2*v*Math.sin(t)/g};})();
@@ -32,8 +32,10 @@
       const soundToggle=$('soundToggle'), soundVolume=$('soundVolume');
       const soundIcon=$('soundIcon'), soundLabel=$('soundLabel'), audioHint=$('audioHint');
       const AudioEngine=window.AudioContext || window.webkitAudioContext;
+      const controlPanel=$('simControls'), controlsIndicator=$('controlsIndicator');
       let soundEnabled=true, audioContext=null, masterSound=null, sceneBus=null;
       let windAudio=null, noiseBuffer=null;
+      const panelControls=Array.from(controlPanel.querySelectorAll('input, select, button')).filter(el=>el!==launchBtn&&el!==resetBtn);
       if(!AudioEngine){
         soundToggle.disabled=true;
         soundToggle.setAttribute('aria-label','El navegador no admite audio');
@@ -45,6 +47,15 @@
         soundIcon.textContent=soundEnabled?'🔊':'🔇';
         soundVolume.disabled=!soundEnabled;
         updateSliderFill(soundVolume);
+      }
+      function setControlPanelLocked(locked){
+        panelControls.forEach(el=>{
+          if(el===soundToggle)el.disabled=locked||!AudioEngine;
+          else if(el===soundVolume)el.disabled=locked||!soundEnabled;
+          else el.disabled=locked;
+        });
+        controlPanel.classList.toggle('is-flight-locked',locked);
+        controlsIndicator.textContent=locked?'BLOQUEADO':'ACTIVO';
       }
       function getAudio(){
         if(!AudioEngine)return null;
@@ -308,9 +319,11 @@
         ctx.fillStyle='#64e2b8';ctx.beginPath();ctx.arc(impactX,base,5,0,Math.PI*2);ctx.fill();
         ctx.textAlign='right';ctx.fillStyle='#79e6c3';ctx.fillText('IMPACTO',Math.min(cw-8,impactX),base-20);
         if(visualProgress<1){
-          const t=values.T*visualProgress,p=timeCoords(t);
-          const dx=values.vx*gw/mx,dy=-(values.vy-values.g*t)*gh/my;
-          drawRocket(px(p.x),py(p.y),Math.atan2(dy,dx),visualProgress);
+          if(rocketVisible){
+            const t=values.T*visualProgress,p=timeCoords(t);
+            const dx=values.vx*gw/mx,dy=-(values.vy-values.g*t)*gh/my;
+            drawRocket(px(p.x),py(p.y),Math.atan2(dy,dx),visualProgress);
+          }
         } else {ctx.strokeStyle='#76ecc3';ctx.lineWidth=2;ctx.beginPath();ctx.arc(impactX,base,10,0,Math.PI*2);ctx.stroke();}
         const now = timeCoords(values.T*visualProgress);
         $('liveTime').textContent=`${numberFormat(values.T*visualProgress)} s`;
@@ -335,16 +348,16 @@
           launchText.textContent='Lanzar proyectil';
           status.textContent='LISTO PARA LANZAR';
         }
+        setControlPanelLocked(playing);
         status.style.color=playing?'#79dbff':'#78e1cb';
       }
       function stopFrame() {playing=false;cancelAnimationFrame(raf);raf=0;lastFrameTime=0;updateButton();}
-      function resetAnimation(){endAudioScene();stopFrame();progress=0;previewing=false;render();updateButton();audioHint.textContent=soundEnabled?'🔊 Audio listo: despegue, viento e impacto.':'🔇 Efectos silenciados.';}
+      function resetAnimation(){endAudioScene();stopFrame();progress=0;previewing=false;rocketVisible=false;render();updateButton();audioHint.textContent=soundEnabled?'🔊 Audio listo: despegue, viento e impacto.':'🔇 Efectos silenciados.';}
       function tick(now){
         if(!playing)return;
         const dt=lastFrameTime?Math.min(now-lastFrameTime,80):0;
         lastFrameTime=now;
-        const durationMs=Math.min(14000,Math.max(1700,values.T*860));
-        progress=Math.min(1,progress+dt/durationMs*Number(speed.value));
+        progress=Math.min(1,progress+dt/flightDurationMs*Number(speed.value));
         render();
         updateFlightAudio();
         if(progress>=1){playImpact();stopFrame();return;}
@@ -352,6 +365,7 @@
       }
       function changed(){
         formatValues();keepCameraStable();
+        if(!playing)rocketVisible=false;
         if(progress>=1){progress=0;}
         if(!playing && progress===0)previewing=true;
         // Preserve animation progress/audio while dragging. Draw every slider 'input' event.
@@ -377,6 +391,8 @@
         if(playing){endAudioScene();stopFrame();audioHint.textContent='⏸ Simulación y sonido en pausa.';return;}
         const newLaunch=progress<=0||progress>=1;
         if(progress>=1)progress=0;
+        if(newLaunch)flightDurationMs=Math.min(14000,Math.max(1700,values.T*860));
+        rocketVisible=true;
         previewing=false;
         startFlightAudio(newLaunch);
         playing=true;lastFrameTime=0;updateButton();render();raf=requestAnimationFrame(tick);
@@ -400,25 +416,4 @@
         const linkObs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){document.querySelectorAll('.nav-links a').forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+e.target.id));}}),{rootMargin:'-28% 0px -64% 0px'});
         document.querySelectorAll('main section[id]').forEach(section=>linkObs.observe(section));
       }
-      const contactForm=$('contactForm'), formNotice=$('formNotice');
-      function makeMessage(){return `Hola, soy ${$('contactName').value.trim()} (${ $('contactEmail').value.trim() }).\n\n${$('contactMessage').value.trim()}\n\nEnviado desde el formulario de VECTOR LAB.`;}
-      contactForm.addEventListener('submit',e=>{
-        e.preventDefault();
-        if(!contactForm.reportValidity())return;
-        const subject=encodeURIComponent('Consulta sobre el simulador VECTOR LAB');
-        const body=encodeURIComponent(makeMessage());
-        formNotice.textContent='Se intentó abrir tu aplicación de correo con un borrador. El destinatario debe ser añadido antes de enviarlo.';
-        window.location.href=`mailto:?subject=${subject}&body=${body}`;
-      });
-      $('copyMessage').addEventListener('click',async()=>{
-        if(!contactForm.reportValidity())return;
-        const message=makeMessage();
-        try{
-          if(navigator.clipboard && window.isSecureContext){await navigator.clipboard.writeText(message);}
-          else {
-            throw new Error('Usar el portapapeles estándar no está disponible');
-          }
-          formNotice.textContent='✓ Mensaje copiado. Ahora puedes pegarlo en el correo o chat que prefieras.';
-        }catch{formNotice.textContent='No se pudo copiar automáticamente. Selecciona el texto de los campos para copiarlo.';}
-      });
     })();

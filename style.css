@@ -17,12 +17,12 @@
     .glass{background:linear-gradient(145deg,rgba(24,37,66,.9),rgba(11,18,34,.9));border:1px solid var(--line);box-shadow:0 18px 50px rgba(0,0,0,.15)}
     .btn{border:0;border-radius:13px;padding:13px 21px;display:inline-flex;align-items:center;justify-content:center;gap:10px;font-size:13px;font-weight:800;transition:transform .22s,filter .22s,background .22s;white-space:nowrap}
     .btn:hover{transform:translateY(-2px);filter:brightness(1.08)}
-    .btn-primary{color:#071326;background:linear-gradient(105deg,#77d7ff,#709aff);box-shadow:0 9px 31px #4386ff43}
     .btn-outline{color:#e8f2ff;background:#1b28466e;border:1px solid #96aeeb32}
     .btn-ghost{color:#edf5ff;background:#263956;border:1px solid rgba(255,255,255,.085)}
-    .download-btn{position:relative;isolation:isolate;overflow:hidden;box-shadow:0 0 16px #75caff38;animation:download-glow 2.8s ease-in-out infinite}
-    .download-btn::after{position:absolute;z-index:0;content:"";top:-70%;left:-35%;width:24%;height:240%;transform:translateX(-300%) rotate(28deg);background:linear-gradient(90deg,transparent,#ffffff0d 25%,#d7f4ffb8 50%,#ffffff0d 75%,transparent);pointer-events:none;animation:download-ray 3s 1s ease-in-out infinite}
-    .download-btn>span{position:relative;z-index:1}
+    .btn-primary,.download-btn{color:#071326;background:linear-gradient(105deg,#77d7ff,#709aff);border:0;box-shadow:0 9px 31px #4386ff43}
+    .btn-primary,.download-btn{position:relative;isolation:isolate;overflow:hidden;animation:download-glow 2.8s ease-in-out infinite}
+    .btn-primary::after,.download-btn::after{position:absolute;z-index:0;content:"";top:-70%;left:-35%;width:24%;height:240%;transform:translateX(-300%) rotate(28deg);background:linear-gradient(90deg,transparent,#ffffff0d 25%,#d7f4ffb8 50%,#ffffff0d 75%,transparent);pointer-events:none;animation:download-ray 3s 1s ease-in-out infinite}
+    .btn-primary>span,.download-btn>span{position:relative;z-index:1}
     @keyframes download-ray{0%,20%{transform:translateX(-300%) rotate(28deg)}75%,100%{transform:translateX(700%) rotate(28deg)}}
     @keyframes download-glow{0%,100%{box-shadow:0 0 12px #75caff2b}50%{box-shadow:0 0 23px #75caff80}}
     .page-loader{position:fixed;z-index:1000;inset:0;display:grid;place-items:start center;overflow:auto;background:#060a16;opacity:1;visibility:visible;transition:opacity .35s ease,visibility .35s ease}
@@ -115,6 +115,16 @@
     .sim-layout{display:grid;grid-template-columns:365px 1fr;gap:21px;align-items:stretch}
     .sim-controls,.sim-view{border-radius:24px;min-width:0;overflow:hidden}
     .sim-controls{padding:29px}
+    .sim-controls.is-flight-locked>.setting,
+    .sim-controls.is-flight-locked>.direct-controls,
+    .sim-controls.is-flight-locked>.gravity-label,
+    .sim-controls.is-flight-locked>.presets,
+    .sim-controls.is-flight-locked>.control-buttons .speed-wrap,
+    .sim-controls.is-flight-locked>.control-buttons .sound-row{opacity:.48;filter:grayscale(.85)}
+    .sim-controls.is-flight-locked .tiny-indicator{color:#aab6cb}
+    .sim-controls.is-flight-locked input:disabled,
+    .sim-controls.is-flight-locked select:disabled,
+    .sim-controls.is-flight-locked button:disabled{cursor:not-allowed}
     .control-title-row{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:28px}
     .control-title-row h3{margin:0;font-size:19px;letter-spacing:-.035em}
     .tiny-indicator{display:flex;gap:5px;align-items:center;color:#71e9cb;font-size:10px;font-weight:800}
@@ -210,21 +220,18 @@
     .contact-layout{display:grid;grid-template-columns:.85fr 1.15fr;gap:90px;align-items:center}
     .contact-info h2{margin-top:14px}
     .contact-info>p{color:#99abca;font-size:15px;max-width:400px;line-height:1.8}
-    .contact-symbol{width:124px;height:124px;margin-top:48px;display:grid;place-items:center;border:1px solid #82b8fc3c;border-radius:28px;background:linear-gradient(145deg,#13315f,#101a31);position:relative;transform:rotate(-9deg);box-shadow:0 16px 44px #2a71eb1d}
-    .contact-symbol svg{width:60px;height:60px;stroke:#83d8ff;stroke-width:1.3;fill:none}
-    .contact-symbol::before{position:absolute;content:"";height:8px;width:8px;background:#51efca;border-radius:50%;right:-14px;top:-8px;box-shadow:0 0 25px #51efca}
-    .contact-form{border-radius:24px;padding:33px}
-    .form-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:23px}
-    .form-head h3{font-size:20px;margin:0;letter-spacing:-.04em}
-    .form-head span{font-size:10px;color:#91a5c6}
-    .field{margin-bottom:17px}
-    .field label{display:block;color:#bdcee8;font-size:11px;font-weight:800;margin-bottom:8px;letter-spacing:.025em}
-    .field input,.field textarea{width:100%;background:#0a1428;border:1px solid #8198c02e;border-radius:11px;color:white;outline:none;padding:13px 15px;font-size:13px;transition:border .2s,box-shadow .2s}
-    .field input::placeholder,.field textarea::placeholder{color:#61738f}
-    .field input:focus,.field textarea:focus{border-color:#72d0ff;box-shadow:0 0 0 3px #4ba9fa22}
-    .field textarea{min-height:116px;resize:vertical}
-    .send-options{display:flex;gap:10px;flex-wrap:wrap}
-    .form-notice{min-height:22px;color:#95c9e3;font-size:11px;margin:13px 0 0}
+    .whatsapp-contact{min-height:280px;border-radius:24px;padding:33px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;color:#f0f5ff;text-decoration:none;transition:transform .2s,border-color .2s}
+    .whatsapp-contact:hover,.whatsapp-contact:focus-visible{transform:translateY(-4px);border-color:#25d366;box-shadow:0 0 22px #25d36655,0 0 54px #25d36633}
+    .whatsapp-contact:hover,.whatsapp-contact:focus-visible{animation:whatsapp-card-bounce .45s ease-out}
+    @keyframes whatsapp-card-bounce{0%{transform:translateY(0) scale(1)}45%{transform:translateY(-9px) scale(1.02)}72%{transform:translateY(-2px) scale(.995)}100%{transform:translateY(-4px) scale(1)}}
+    .whatsapp-contact:hover .whatsapp-icon,.whatsapp-contact:focus-visible .whatsapp-icon{filter:drop-shadow(0 0 12px #25d366)}
+    .whatsapp-icon-wrap{position:relative;display:grid;place-items:center}
+    .whatsapp-icon{width:82px;height:82px}
+    .whatsapp-lightning{position:absolute;top:-8px;right:-5px;width:26px;height:40px;fill:#d7ff70;stroke:#fff;stroke-width:1.5;filter:drop-shadow(0 0 6px #d7ff70);opacity:0;transform:scale(.6) rotate(-8deg);animation:whatsapp-lightning-flash 3.2s ease-in-out infinite}
+    @keyframes whatsapp-lightning-flash{0%,74%,100%{opacity:0;transform:scale(.6) rotate(-8deg)}77%,81%{opacity:1;transform:scale(1.08) rotate(-8deg)}79%,84%{opacity:.15}}
+    @media(prefers-reduced-motion:reduce){.whatsapp-lightning{animation:none;opacity:0}.whatsapp-contact:hover,.whatsapp-contact:focus-visible{animation:none}}
+    .whatsapp-contact-label{font-size:20px;font-weight:800}
+    .whatsapp-contact-hint{font-size:13px;color:#95a9c8}
     .footer{border-top:1px solid #859fcd20;background:#060a15;padding:28px 0}
 
     .uni-badge{display:flex;align-items:center;gap:10px;padding:8px 12px;border:1px solid rgba(255,255,255,.08);border-radius:999px;background:rgba(255,255,255,.04);box-shadow:0 8px 26px rgba(0,0,0,.12)}
@@ -354,6 +361,9 @@
       .sound-volume{width:100%;justify-content:space-between}
       #soundVolume{width:140px;max-width:55%}
     }
+    @media (min-width:621px) and (max-width:740px){
+      .sim-view{position:relative;top:auto;z-index:auto}
+    }
     /* Celulares: priorizar trayectoria visible, botones accesibles, sin desborde horizontal. */
     @media(max-width:620px){
       html{scroll-padding-top:77px}
@@ -364,7 +374,7 @@
       .setting-head{align-items:center;gap:8px}
       .setting-head label{min-width:0;line-height:1.45}
       .value-badge{flex-shrink:0;font-variant-numeric:tabular-nums}
-      .sim-view{height:clamp(324px,46dvh,380px);min-height:324px}
+      .sim-view{position:relative;top:auto;z-index:auto;height:clamp(324px,46dvh,380px);min-height:324px}
       .sim-view .graph-wrap{min-height:195px}
       .sim-controls{padding:19px}
       .control-buttons .btn{min-height:46px}
@@ -372,8 +382,6 @@
       .sound-toggle{min-height:38px}
       .graph-fit-btn{min-height:32px}
       .graph-legend{row-gap:4px}
-      .contact-form{min-width:0}
-      .field input,.field textarea{font-size:16px}
     }
     @media(max-width:355px){
       .nav-inner>.uni-badge{padding:4px 5px}
