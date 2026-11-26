@@ -63,7 +63,7 @@
     .nav-cta{padding:10px 17px}
     .menu-toggle{display:none;border:1px solid var(--line);color:#fff;background:#24334f;width:42px;height:42px;border-radius:11px;align-items:center;justify-content:center}
     .hero{position:relative;min-height:710px;display:flex;align-items:center;overflow:hidden;padding:98px 0 94px;isolation:isolate}
-    .hero::before{position:absolute;inset:0;z-index:-2;content:"";background:linear-gradient(90deg,rgba(6,10,22,.83),rgba(6,10,22,.55) 42%,rgba(6,10,22,.17)),linear-gradient(0deg,rgba(6,10,22,.55),transparent 34%,transparent 72%,rgba(6,10,22,.2)),url("assets/earth-horizon.png") center/cover no-repeat}
+    .hero::before{position:absolute;inset:0;z-index:-2;content:"";background:linear-gradient(90deg,rgba(6,10,22,.83),rgba(6,10,22,.55) 42%,rgba(6,10,22,.17)),linear-gradient(0deg,rgba(6,10,22,.55),transparent 34%,transparent 72%,rgba(6,10,22,.2)),var(--hero-image) center/cover no-repeat}
     .starfield{position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.65;background-image:radial-gradient(1px 1px at 15% 11%,white 95%,transparent),radial-gradient(1px 1px at 62% 37%,#a3c9ff 95%,transparent),radial-gradient(2px 2px at 32% 70%,#90cbff 95%,transparent),radial-gradient(1px 1px at 74% 12%,#e0eaff 95%,transparent),radial-gradient(1px 1px at 87% 75%,white 95%,transparent),radial-gradient(1px 1px at 45% 29%,#fff 95%,transparent),radial-gradient(2px 2px at 55% 91%,#b7e9ff 95%,transparent);background-size:410px 345px,530px 390px,360px 370px,570px 495px,380px 430px,650px 500px,720px 520px}
     .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:38px;width:100%}
     .hero-copy{position:relative;z-index:2}
